@@ -1,6 +1,8 @@
 import boto3
+from models import database
+import sentry_sdk
+from sentry_sdk import capture_exception
 class S3_helper:
-
     def __init__(self):
         self.client_s3 = boto3.client('s3')
 
