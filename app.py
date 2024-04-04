@@ -1,8 +1,10 @@
+import os
 import psycopg2
 import boto3
 from models import database
 import sentry_sdk
 from sentry_sdk import capture_exception
+
 
 class S3Helper:
     def __init__(self):
@@ -23,18 +25,29 @@ class S3Helper:
             capture_exception(e)
             return str(e)
     
-    def create_s3_bucket(self, bucket_name):
+    def create_s3_bucket(self, bucket_name, region=None):
         try:
-            response = self.client_s3.create_bucket(
-                Bucket = bucket_name,
-            )
-            print(response)
+            if region is None:
+             response = self.client_s3.create_bucket(Bucket=bucket_name)
+
+            else:
+                if region == 'us-east-1':
+                    location = ''
+
+                else:
+                    client_s3 = boto3.client('s3', region_name=region)
+                    location = {'LocationConstraint': region}
+                    response = client_s3.create_bucket(Bucket=bucket_name,
+                                            CreateBucketConfiguration=location)
             database.add_record('s3','create_s3_bucket',response)
             return response
+        except self.client_s3.exceptions.BucketAlreadyExists as e:
+            print(f"Bucket '{bucket_name}' already exists.")
+            return None 
         except Exception as e:
             print(f"An error occurred: {e}")
-            # capture_exception(e)
-            # return str(e)
+            capture_exception(e)
+            return str(e)
 
     # retrieves metadata from an object without returning the object itself    
     def get_storage_class(self,bucket_name, file_key):
@@ -54,6 +67,18 @@ class S3Helper:
             response = self.client_s3.delete_object(Bucket=bucket_name, Key=file_key)
             database.add_record('s3','delete_file_from_s3',response)
             print(f"File '{file_key}' deleted successfully.")
+            return response
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            capture_exception(e)
+            return str(e)
+        
+    def delete_bucket(self,bucket_name):
+        try:
+            response = self.client_s3.delete_bucket(
+                Bucket = bucket_name
+            )
+            database.add_record('s3','delete_bucket',response)
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -108,6 +133,7 @@ class S3Helper:
                 Bucket = bucket_name
             )
             database.add_record('s3','objects_list',response)
+            print(response)
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -172,5 +198,8 @@ class S3Helper:
             capture_exception(e)
             return str(e)
         
-# obj = S3Helper()
-# obj.create_s3_bucket("temp")
+obj = S3Helper()
+obj.bucket_list_names()
+# obj.create_s3_bucket('tmp-etl','us-east-2')
+# obj.objects_list('app.timechronos.com')
+# obj.delete_bucket('tmp-s3-etl')
