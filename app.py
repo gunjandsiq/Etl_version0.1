@@ -16,6 +16,7 @@ class S3Helper:
             for bucket in response['Buckets']:
                 bucket_list.append(bucket['Name'])
             database.add_record('s3','bucket_list_names',bucket_list)
+            print(bucket_list)
             return bucket_list
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -32,8 +33,8 @@ class S3Helper:
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
-            capture_exception(e)
-            return str(e)
+            # capture_exception(e)
+            # return str(e)
 
     # retrieves metadata from an object without returning the object itself    
     def get_storage_class(self,bucket_name, file_key):
@@ -171,5 +172,5 @@ class S3Helper:
             capture_exception(e)
             return str(e)
         
-obj = S3Helper()
-obj.bucket_list_names()
+# obj = S3Helper()
+# obj.create_s3_bucket("temp")
