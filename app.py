@@ -1,8 +1,10 @@
+import psycopg2
 import boto3
 from models import database
 import sentry_sdk
 from sentry_sdk import capture_exception
-class S3_helper:
+
+class S3Helper:
     def __init__(self):
         self.client_s3 = boto3.client('s3')
 
@@ -168,3 +170,6 @@ class S3_helper:
             print(f"An error occurred: {e}")
             capture_exception(e)
             return str(e)
+        
+obj = S3Helper()
+obj.bucket_list_names()
