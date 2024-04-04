@@ -105,7 +105,7 @@ class S3Helper:
     #         return str(e)
 
     # Creates a copy of an object that is already stored in s3   
-    def change_storage_class(self,bucket_name, file_key, new_storage_class):
+    def change_storage_class(self,bucket_name, file_key,new_storage_class):
         try:
             copy_source = {
                 'Bucket': bucket_name,
@@ -147,8 +147,17 @@ class S3Helper:
                 Bucket = bucket_name,
                 Key = file_key 
             )
-            database.add_record('s3','get_object',response)
-            return response
+            contentlen =response['ContentLength']
+            etag =response['ETag']
+            contenttype =response['ContentType']
+            output = {
+                'ContentLength' : contentlen,
+                'ETag' : etag,
+                'ContentType' : contenttype
+            }
+            database.add_record('s3','get_object',output)
+            print(output)
+            return output
         except Exception as e:
             print(f"An error occurred: {e}")
             capture_exception(e)
@@ -162,6 +171,7 @@ class S3Helper:
                 Key = file_key 
             )
             database.add_record('s3','put_object_in_s3',response)
+            print(response)
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -176,7 +186,8 @@ class S3Helper:
                 Bucket = bucket_name,                                                 # The name of the bucket 
                 Key = file_key                                                        # The name of the key
             )
-            database.add_record('s3','upload_file_to_object',response)
+            database.add_record('s3','upload_file_to_object','file uploaded')
+            print(f"{file_key} uploaded sucessfully ")
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -191,15 +202,20 @@ class S3Helper:
                 Key = file_key,                                                        # The name of the key
                 Filename = file_path                                                   # The path to the file
             )
-            database.add_record('s3','download_object_to_file',response)
+            database.add_record('s3','download_object_to_file','file downloaded')
+            print(f"{file_key} downloaded sucessfully ")
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
             capture_exception(e)
             return str(e)
         
-obj = S3Helper()
-obj.bucket_list_names()
+# obj = S3Helper()
+# obj.bucket_list_names()
 # obj.create_s3_bucket('tmp-etl','us-east-2')
-# obj.objects_list('app.timechronos.com')
+# obj.put_object_in_s3('app.timechronos.com','asset-manifest.json')
 # obj.delete_bucket('tmp-s3-etl')
+# obj.objects_list('app.timechronos.com',)
+# path = "/mnt/c/Users/MediaAmp-3/loreal/Etl_version0.1/hello.txt"
+# obj.download_object_to_file('app.timechronos.com','robots.txt','robots.txt')
+# obj.change_storage_class('tmp-etl','hello.txt')
