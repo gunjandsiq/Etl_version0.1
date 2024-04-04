@@ -57,24 +57,24 @@ class S3_helper:
             capture_exception(e)
             return str(e)
         
-    def filter_bucket(self,bucket_name, min_date=None, max_date=None,report_type=None):
-        try:
-            response = self.client_s3.list_objects_v2(Bucket=bucket_name)
-            file_names = []
-            for obj in response['Contents']:
-                if obj['Key'].startswith("BelSkai"):
-                    date = obj['Key'].split('_')[1].split('.')[0]
-                    origanal_report_type=obj['Key'].split('_')[0].replace("BelSkai","")
-                    # Check if date is within the specified range
-                if (min_date is None or date >= min_date) and (max_date is None or date <= max_date) and (report_type is None or origanal_report_type == report_type):
-                    file_names.append(obj['Key'])
-                    # print(obj['Key'])
-            database.add_record('s3','filter_bucket',file_names)       
-            return file_names
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            capture_exception(e)
-            return str(e)
+    # def filter_bucket(self,bucket_name, min_date=None, max_date=None,report_type=None):
+    #     try:
+    #         response = self.client_s3.list_objects_v2(Bucket=bucket_name)
+    #         file_names = []
+    #         for obj in response['Contents']:
+    #             if obj['Key'].startswith("BelSkai"):
+    #                 date = obj['Key'].split('_')[1].split('.')[0]
+    #                 origanal_report_type=obj['Key'].split('_')[0].replace("BelSkai","")
+    #                 # Check if date is within the specified range
+    #             if (min_date is None or date >= min_date) and (max_date is None or date <= max_date) and (report_type is None or origanal_report_type == report_type):
+    #                 file_names.append(obj['Key'])
+    #                 # print(obj['Key'])
+    #         database.add_record('s3','filter_bucket',file_names)       
+    #         return file_names
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
+    #         capture_exception(e)
+    #         return str(e)
 
     # Creates a copy of an object that is already stored in s3   
     def change_storage_class(self,bucket_name, file_key, new_storage_class):
