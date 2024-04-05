@@ -126,15 +126,22 @@ class S3Helper:
             capture_exception(e)
             return str(e)
     
-    # Returns all objects in a bucket   
-    def objects_list(self,bucket_name): 
+    def object_keys(self, bucket_name):
         try:
-            response = self.client_s3.list_objects(
-                Bucket = bucket_name
-            )
-            database.add_record('s3','objects_list',response)
-            print(response)
-            return response
+            key_list = []
+            response = self.client_s3.list_objects(Bucket=bucket_name)
+            if 'Contents' in response:
+                # Extract only the 'Key' from each object and append to key_list
+                for obj in response['Contents']:
+                    key_list.append(obj['Key'])
+
+                database.add_record('s3', 'object_keys', key_list)
+                print(key_list)
+                return key_list
+            else:
+                print("No objects found in the bucket.")
+                return response
+
         except Exception as e:
             print(f"An error occurred: {e}")
             capture_exception(e)
