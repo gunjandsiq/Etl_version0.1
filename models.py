@@ -1,33 +1,35 @@
 from datetime import datetime
-from sqlalchemy import create_engine, event, Date, TIME, JSON, Column, Integer, String
-from sqlalchemy.orm import sessionmaker, declarative_base
+from flask import Blueprint, app
+from flask_sqlalchemy import SQLAlchemy
+
+
 import sentry_sdk
 # from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('postgresql://postgres:238956@localhost:5432/postgres')
-Session = sessionmaker(bind=engine)
-Base =  declarative_base()
+# engine = create_engine('postgresql://postgres:238956@localhost:5432/postgres')
+bp=Blueprint('model',__name__)
+db = SQLAlchemy()
 
 class Timestamp(object):
-    created_date = Column(Date, default=datetime.now())
-    created_time = Column(TIME, default=datetime.now())
-    updated_date = Column(Date, default=datetime.now(), onupdate=datetime.now())
-    updated_time = Column(TIME, default=datetime.now(), onupdate=datetime.now())
+    created_date = db.Column(db.Date, default=datetime.now())
+    created_time = db.Column(db.TIME, default=datetime.now())
+    updated_date = db.Column(db.Date, default=datetime.now(), onupdate=datetime.now())
+    updated_time = db.Column(db.TIME, default=datetime.now(), onupdate=datetime.now())
 
-class aws_Audit_log(Base,Timestamp):
+class aws_Audit_log(db.Model,Timestamp):
     __tablename__ = "audit_log"
-    id = Column(Integer, primary_key=True)
-    serviceName = Column(String(255), nullable=False)
-    function_name = Column(String(255), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    serviceName = db.Column(db.String(255), nullable=False)
+    function_name = db.Column(db.String(255), nullable=False)
     # description = db.Column(db.String(255), unique=True, nullable=False)
-    response = Column(JSON, nullable=True)
+    response = db.Column(db.JSON, nullable=True)
 
-Base.metadata.create_all(engine)
+
 
 class database:
     def add_record(service_name,function_name,response):
         try:
-            session = Session()
+            session = db.Session()
             add = aws_Audit_log(serviceName=service_name,function_name=function_name,response=response)
             session.add(add)
             session.commit()
@@ -53,3 +55,10 @@ class database:
     #         print(f"An error occurred: {e}")
     #         sentry_sdk.capture_exception(e)
     #         return str(e)
+
+
+
+@bp.route('/dbcreate')
+def db_create():
+    db.create_all()
+    return "All Database creatred"
