@@ -126,7 +126,7 @@ class S3Helper:
             capture_exception(e)
             return str(e)
     
-    def object_keys(self, bucket_name):
+    def object_list(self, bucket_name):
         try:
             key_list = []
             response = self.client_s3.list_objects(Bucket=bucket_name)
@@ -216,19 +216,9 @@ class S3Helper:
             print(f"An error occurred: {e}")
             capture_exception(e)
             return str(e)
-        
-# obj = S3Helper()
-# obj.bucket_list_names()
-# obj.create_s3_bucket('tmp-etl','us-east-2')
-# obj.put_object_in_s3('app.timechronos.com','asset-manifest.json')
-# obj.delete_bucket('tmp-s3-etl')
-# obj.objects_list('app.timechronos.com',)
-# path = "/mnt/c/Users/MediaAmp-3/loreal/Etl_version0.1/hello.txt"
-# obj.download_object_to_file('app.timechronos.com','robots.txt','robots.txt')
-# obj.change_storage_class('tmp-etl','hello.txt')
 
-@s3_bp.route("/list")
-def list_bucket():
-    obj = S3Helper()
-    out = obj.bucket_list_names()
-    return out
+# @s3_bp.route("/list")
+# def list_bucket():
+#     obj = S3Helper()
+#     out = obj.bucket_list_names()
+#     return out
