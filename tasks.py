@@ -1,7 +1,12 @@
-from celery import Celery
+from flask import Blueprint, jsonify
 
-celery = Celery("tasks",backend = f'db+postgresql://postgres:238956@localhost:5432/postgres',broker ='redis://:JUSTWIN12@localhost:6379/0')
+tasks_bp = Blueprint("tasks",__name__)
 
 @celery.task
 def add(x, y):
     return x + y
+
+@tasks_bp.route("/run_task")
+def run_task():
+    result = add.delay(3, 5) 
+    return jsonify({"task_id": result.id})
