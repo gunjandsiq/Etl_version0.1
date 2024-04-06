@@ -25,7 +25,7 @@ class aws_Audit_log(db.Model,Timestamp):
     response = db.Column(db.JSON, nullable=True)
 
 
-
+  
 class database:
     def add_record(service_name,function_name,response):
         try:

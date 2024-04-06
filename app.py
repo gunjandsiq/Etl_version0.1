@@ -8,14 +8,13 @@ from tasks import tasks_bp
 app=Flask(__name__)
 # celery = Celery(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:first@localhost:5432/postgres'
-app.config['REDIS_BROKER_URL'] = f'redis://:JUSTWIN12@localhost:6379/0'
-app.config['REDIS_BACKEND_URL'] = f'db+postgresql://postgres:238956@localhost:5432/postgres'
+def create_app():
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:first@localhost:5432/postgres' 
+    db.init_app(app)
 
 celery = Celery(__name__,backend = app.config['REDIS_BACKEND_URL'],broker =app.config['REDIS_BROKER_URL'])
 
-db.init_app(app)
-
+# Blueprint
 app.register_blueprint(bp)
 app.register_blueprint(s3_bp)
 app.register_blueprint(tasks_bp)
