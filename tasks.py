@@ -1,4 +1,5 @@
-from app import celery
+from app import celery 
+from celery import chain  # type: ignore
 
 
 @celery.task

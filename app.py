@@ -3,17 +3,17 @@ from models import bp,db
 from utils.s3 import s3_bp
 from etl import etl_bp
 from celery import Celery # type: ignore
-
+from config import user,password,host,port,redis_password,redis_host,redis_port,database
 
 app=Flask(__name__)
 
 
 # app.config['REDIS_BACKEND_URL'] = 'redis://:JUSTWIN12@localhost:6379/0'
 # app.config['REDIS_BROKER_URL'] = 'db+postgresql://postgres:first@localhost:5432/postgres' 
-celery = Celery(__name__, backend= 'db+postgresql://postgres:238956@localhost:5432/postgres', broker='redis://:JUSTWIN12@localhost:6379/0')
+celery = Celery(__name__, backend= f'db+postgresql://{user}:{password}@{host}:{port}/{database}', broker=f'redis://:{redis_password}@{redis_host}:{redis_port}/0')
 
 def create_app():
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:238956@localhost:5432/postgres'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{user}:{password}@{host}:{port}/{database}'
     db.init_app(app)
     celery.conf.update(
         task_serializer='json',

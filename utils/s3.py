@@ -3,8 +3,12 @@ import boto3
 from models import database
 import sentry_sdk
 from sentry_sdk import capture_exception
+from config import bucket , local_path
 
 s3_bp = Blueprint('S3',__name__)
+
+bucket_name = bucket
+
 
 class S3Helper:
     def __init__(self):
@@ -15,11 +19,12 @@ class S3Helper:
         try:
             bucket_list = []
             response = self.client_s3.list_buckets()
-            for bucket in response['Buckets']:
-                bucket_list.append(bucket['Name'])
-            database.add_record('s3','bucket_list_names',bucket_list)
-            print(bucket_list)
-            return bucket_list
+            if response:
+                print('Bucket exists...')
+                for bucket in response['Buckets']:
+                    bucket_list.append(bucket['Name'])
+                database.add_record('s3','bucket_list_names',bucket_list)
+                return bucket_list
         except Exception as e:
             print(f"An error occurred: {e}")
             capture_exception(e)
@@ -126,7 +131,8 @@ class S3Helper:
             capture_exception(e)
             return str(e)
     
-    def object_list(self, bucket_name):
+    # List of files in bucket
+    def get_file_names(self, bucket_name):
         try:
             key_list = []
             response = self.client_s3.list_objects(Bucket=bucket_name)
@@ -218,3 +224,10 @@ class S3Helper:
             return str(e)
 
 
+
+
+
+    
+
+    
+        
