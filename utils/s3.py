@@ -217,9 +217,4 @@ class S3Helper:
             capture_exception(e)
             return str(e)
 
-@s3_bp.route("/list")
-def list_bucket():
-    obj = S3Helper()
-    out = obj.create_s3_bucket('temp-s3-etl','us-east-2')
-    return out
 

@@ -29,11 +29,10 @@ class aws_Audit_log(db.Model,Timestamp):
 class database:
     def add_record(service_name,function_name,response):
         try:
-            session = db.Session()
             add = aws_Audit_log(serviceName=service_name,function_name=function_name,response=response)
-            session.add(add)
-            session.commit()
-            session.close()
+            db.session.add(add)
+            db.session.commit()
+            db.close()
         except Exception as e:
             print(f"An error occurred: {e}")
             sentry_sdk.capture_exception(e)
