@@ -56,9 +56,5 @@ class database:
     #         sentry_sdk.capture_exception(e)
     #         return str(e)
 
-
-
-@bp.route('/dbcreate')
-def db_create():
+def create_db():
     db.create_all()
-    return "All Database creatred"
