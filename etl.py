@@ -3,7 +3,7 @@ from flask import Blueprint
 import pandas as pd
 from sentry_sdk import capture_exception
 
-etl_bp = Blueprint("df",__name__)
+etl_bp =Blueprint("df",__name__)
 class DFHelper:
     def reindex(self,df,columns):
         try:

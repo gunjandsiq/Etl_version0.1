@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, app
 from flask_sqlalchemy import SQLAlchemy
+from utils.helper import DbHelper
 
 
 import sentry_sdk
@@ -30,9 +31,8 @@ class Database:
     def add_record(self,service_name,function_name,response):
         try:
             add = aws_Audit_log(serviceName=service_name,function_name=function_name,response=response)
-            db.session.add(add)
-            db.session.commit()
-            db.close()
+            obj = DbHelper()
+            obj.add_record(add)
         except Exception as e:
             print(f"An error occurred: {e}")
             sentry_sdk.capture_exception(e)

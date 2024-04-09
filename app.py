@@ -23,7 +23,7 @@ def create_app():
         worker_disable_rate_limits = False,
         result_extended=True,
         enable_utc=True,
-        broker_connection_retry_on_startup=True,
+        broker_connection_retry_on_startup=True
     )
    
     # Blueprint
