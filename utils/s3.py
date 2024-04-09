@@ -1,6 +1,6 @@
 from flask import Blueprint
 import boto3
-from models import database
+from models import Database
 import sentry_sdk
 from sentry_sdk import capture_exception
 from config import bucket , local_path
@@ -13,6 +13,7 @@ bucket_name = bucket
 class S3Helper:
     def __init__(self):
         self.client_s3 = boto3.client('s3')
+        self.database = Database()
 
     # Returns a list of all buckets 
     def bucket_list_names(self):
@@ -23,7 +24,7 @@ class S3Helper:
                 print('Bucket exists...')
                 for bucket in response['Buckets']:
                     bucket_list.append(bucket['Name'])
-                database.add_record('s3','bucket_list_names',bucket_list)
+                self.database.add_record('s3','bucket_list_names',bucket_list)
                 return bucket_list
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -44,7 +45,7 @@ class S3Helper:
                     location = {'LocationConstraint': region}
                     response = client_s3.create_bucket(Bucket=bucket_name,
                                             CreateBucketConfiguration=location)
-            database.add_record('s3','create_s3_bucket',response)
+            self.database.add_record('s3','create_s3_bucket',response)
             return response
         except self.client_s3.exceptions.BucketAlreadyExists as e:
             print(f"Bucket '{bucket_name}' already exists.")
@@ -59,7 +60,7 @@ class S3Helper:
         try:
             response = self.client_s3.head_object(Bucket=bucket_name, Key=file_key)
             storage_class = response.get('StorageClass')
-            database.add_record('s3','get_storage_class',storage_class)
+            self.database.add_record('s3','get_storage_class',storage_class)
             return storage_class
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -70,7 +71,7 @@ class S3Helper:
     def delete_file_from_s3(self,bucket_name, file_key):
         try:
             response = self.client_s3.delete_object(Bucket=bucket_name, Key=file_key)
-            database.add_record('s3','delete_file_from_s3',response)
+            self.database.add_record('s3','delete_file_from_s3',response)
             print(f"File '{file_key}' deleted successfully.")
             return response
         except Exception as e:
@@ -83,7 +84,7 @@ class S3Helper:
             response = self.client_s3.delete_bucket(
                 Bucket = bucket_name
             )
-            database.add_record('s3','delete_bucket',response)
+            self.database.add_record('s3','delete_bucket',response)
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -102,7 +103,7 @@ class S3Helper:
     #             if (min_date is None or date >= min_date) and (max_date is None or date <= max_date) and (report_type is None or origanal_report_type == report_type):
     #                 file_names.append(obj['Key'])
     #                 # print(obj['Key'])
-    #         database.add_record('s3','filter_bucket',file_names)       
+    #         self.database.add_record('s3','filter_bucket',file_names)       
     #         return file_names
     #     except Exception as e:
     #         print(f"An error occurred: {e}")
@@ -141,7 +142,7 @@ class S3Helper:
                 for obj in response['Contents']:
                     key_list.append(obj['Key'])
 
-                database.add_record('s3', 'object_keys', key_list)
+                self.database.add_record('s3', 'object_keys', key_list)
                 print(key_list)
                 return key_list
             else:
@@ -168,7 +169,7 @@ class S3Helper:
                 'ETag' : etag,
                 'ContentType' : contenttype
             }
-            database.add_record('s3','get_object',output)
+            self.database.add_record('s3','get_object',output)
             print(output)
             return output
         except Exception as e:
@@ -183,7 +184,7 @@ class S3Helper:
                 Bucket = bucket_name,
                 Key = file_key 
             )
-            database.add_record('s3','put_object_in_s3',response)
+            self.database.add_record('s3','put_object_in_s3',response)
             print(response)
             return response
         except Exception as e:
@@ -199,7 +200,7 @@ class S3Helper:
                 Bucket = bucket_name,                                                 # The name of the bucket 
                 Key = file_key                                                        # The name of the key
             )
-            database.add_record('s3','upload_file_to_object','file uploaded')
+            self.database.add_record('s3','upload_file_to_object','file uploaded')
             print(f"{file_key} uploaded sucessfully ")
             return response
         except Exception as e:
@@ -215,7 +216,7 @@ class S3Helper:
                 Key = file_key,                                                        # The name of the key
                 Filename = file_path                                                   # The path to the file
             )
-            database.add_record('s3','download_object_to_file','file downloaded')
+            self.database.add_record('s3','download_object_to_file','file downloaded')
             print(f"{file_key} downloaded sucessfully ")
             return response
         except Exception as e:

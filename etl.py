@@ -3,14 +3,13 @@ from flask import Blueprint
 import pandas as pd
 from sentry_sdk import capture_exception
 
-etl_bp = ("df",__name__)
+etl_bp = Blueprint("df",__name__)
 class DFHelper:
-
     def reindex(self,df,columns):
         try:
             df = df.reindex(columns=columns)
             return df
-        except Exception as e:
+        except Exception as e: 
             print(f"An error occurred: {e}")
             capture_exception(e)
             return str(e)

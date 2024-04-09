@@ -26,8 +26,8 @@ class aws_Audit_log(db.Model,Timestamp):
 
 
   
-class database:
-    def add_record(service_name,function_name,response):
+class Database:
+    def add_record(self,service_name,function_name,response):
         try:
             add = aws_Audit_log(serviceName=service_name,function_name=function_name,response=response)
             db.session.add(add)
